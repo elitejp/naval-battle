@@ -1,9 +1,10 @@
 const grid = [];
 const gridEnemy = [];
 const field = document.querySelector(".field");
+const fieldEnemy = document.querySelector(".field-enemy");
 let shipClass;
 let x, y;
-let aux = "";
+let aux = ""; // Auxiliar para colocar Navio - Estado do "colocamento"
 console.log(field);
 
 function criarGrids() {
@@ -16,6 +17,9 @@ function criarGrids() {
       let divGrid = document.createElement("div");
       divGrid.setAttribute("class", `${i}${j}`);
       field.appendChild(divGrid);
+      let divGridEnemy = document.createElement("div");
+      divGridEnemy.setAttribute("class", `${i}${j}`);
+      fieldEnemy.appendChild(divGridEnemy);
     }
   }
   console.log(grid);
@@ -48,7 +52,7 @@ function putShip(event) {
         } else {aux = "getShip"}
         break;
       case "ship2":
-        if (ship3Ready) {
+        if (ship2Ready) {
           alert("Ja posicionou esse Navio");
           aux = "shipNotGet";
         } else {aux = "getShip"}
@@ -97,6 +101,7 @@ function putShip(event) {
               }
               break;
             case "ship4":
+              console.log(x+" - "+y);
               if ((i<=4) && (grid[x][(y+i-1)] != "0")) {
                 aux = "putFail";
               }
@@ -194,7 +199,7 @@ function putShip(event) {
 function shotShip(coordinateX, coordinateY) {
   let element = field.getElementsByClassName(""+coordinateX+coordinateY);
   console.log(element);
-  element[0].setAttribute("src", "assets/img/explosion.png");
+  element[1].setAttribute("src", "assets/img/explosion.png");
   grid[coordinateX][coordinateY] = "0";
   let explosionSound = new Audio("assets/sounds/explosion.mp3");
   explosionSound.play();
@@ -209,8 +214,8 @@ function shotWater(coordinateX, coordinateY) {
   newSplash.setAttribute("src", `assets/img/splash.png`);
   element[0].appendChild(newSplash);
 
-  let explosionSound = new Audio("assets/sounds/explosion.mp3");
-  explosionSound.play();
+  let splashSound = new Audio("assets/sounds/splash.mp3");
+  splashSound.play();
 }
 
 criarGrids();
