@@ -5,7 +5,11 @@ const fieldEnemy = document.querySelector(".field-enemy");
 let shipClass;
 let x, y;
 let aux = ""; // Auxiliar para colocar Navio - Estado do "colocamento"
+let gameStatus = "preGame"
 console.log(field);
+
+let splashSound = new Audio("assets/sounds/splash.mp3");
+let explosionSound = new Audio("assets/sounds/explosion.mp3");
 
 function criarGrids() {
   for (let i=0;i<8; i++) {
@@ -34,7 +38,9 @@ function resetGrids() {
   }
 }
 
-document.addEventListener("click", putShip);
+if (gameStatus == "preGame") {
+  document.addEventListener("click", putShip);
+}
 let itemClicked;
 let ship1Ready, ship2Ready, ship3Ready, ship4Ready, ship5Ready = false;
 function putShip(event) {
@@ -196,26 +202,119 @@ function putShip(event) {
   }
 }
 
-function shotShip(coordinateX, coordinateY) {
-  let element = field.getElementsByClassName(""+coordinateX+coordinateY);
-  console.log(element);
+function shotShip(coordinateX, coordinateY, fieldAtk) {
+  let element = fieldAtk.getElementsByClassName(""+coordinateX+coordinateY);
+  
   element[1].setAttribute("src", "assets/img/explosion.png");
-  grid[coordinateX][coordinateY] = "0";
-  let explosionSound = new Audio("assets/sounds/explosion.mp3");
+  grid[coordinateX][coordinateY] = "-2";
+
+  if (fieldAtk.className == "field-enemy") {
+    let newExplosion = document.createElement("img");
+    newExplosion.setAttribute("class", ("explosion " + coordinateX+coordinateY));
+    newExplosion.setAttribute("src", `assets/img/explosion.png`);
+    element[0].appendChild(newExplosion);
+  }
+
   explosionSound.play();
   console.log(grid);
 }
 
-function shotWater(coordinateX, coordinateY) {
-  let element = field.getElementsByClassName(""+coordinateX+coordinateY);
+function shotWater(coordinateX, coordinateY, fieldAtk) {
+  let element = fieldAtk.getElementsByClassName(""+coordinateX+coordinateY);
   let newSplash = document.createElement("img");
 
   newSplash.setAttribute("class", ("splash " + coordinateX+coordinateY));
   newSplash.setAttribute("src", `assets/img/splash.png`);
   element[0].appendChild(newSplash);
 
-  let splashSound = new Audio("assets/sounds/splash.mp3");
   splashSound.play();
 }
 
+
+function putEnemyShip(shipEnemy) {
+  let xEnemy = Math.round(Math.random()*7);
+  let yEnemy = Math.round(Math.random()*7);
+  let auxEnemy = "putFail"
+  
+  while (auxEnemy == "putFail") {
+    xEnemy = Math.round(Math.random()*7);
+    yEnemy = Math.round(Math.random()*7);
+    auxEnemy = "putShip";
+    for (let i=1; i<=5; i++) {
+      switch (shipEnemy) {
+        case "ship1":
+          if ((i<=1) && (gridEnemy[xEnemy][(yEnemy+i-1)] != "0")) {
+            auxEnemy = "putFail";
+          }
+          break;
+        case "ship2":
+          if ((i<=2) && (gridEnemy[xEnemy][(yEnemy+i-1)] != "0")) {
+            auxEnemy = "putFail";
+          }
+          break;
+        case "ship3":
+          if ((i<=3) && (gridEnemy[xEnemy][(yEnemy+i-1)] != "0")) {
+            auxEnemy = "putFail";
+          }
+          break;
+        case "ship4":
+          if ((i<=4) && (gridEnemy[xEnemy][(yEnemy+i-1)] != "0")) {
+            auxEnemy = "putFail";
+          }
+          break;
+        case "ship5":
+          if ((gridEnemy[xEnemy][(yEnemy+i-1)] != "0")&&(i<=3)) {
+            auxEnemy = "putFail";
+          }
+          if ((xEnemy+i-3)<8){
+            if ((i>3)&&(gridEnemy[(xEnemy+i-3)][(yEnemy+1)] != "0")) {
+              auxEnemy = "putFail";
+            }
+          } else {
+            auxEnemy = "putFail";
+          }
+          break;
+      }
+    }
+  }
+
+  if (auxEnemy == "putShip") {
+    console.log("test");
+    switch (shipEnemy) {
+      case "ship1":
+        gridEnemy[xEnemy][yEnemy] = "1";
+        break;
+      case "ship2":
+        for (let i=1;i<=2;i++) {
+          gridEnemy[xEnemy][(yEnemy+i-1)] = "2";
+        }
+        break;
+      case "ship3":
+        for (let i=1;i<=3;i++) {
+          gridEnemy[xEnemy][(yEnemy+i-1)] = "3";
+        }
+        break;
+      case "ship4":
+        for (let i=1;i<=4;i++) {
+          gridEnemy[xEnemy][(yEnemy+i-1)] = "4";
+        }
+        break;
+      case "ship5":
+        for (let i=1;i<=5;i++) {
+          if (i<=3) {
+            gridEnemy[xEnemy][(yEnemy+i-1)] = "5";
+          } else {
+            gridEnemy[(xEnemy+i-3)][(yEnemy+1)] = "5";
+          }
+        }
+        break;
+    }
+  }
+}
+
 criarGrids();
+putEnemyShip("ship1");
+putEnemyShip("ship2");
+putEnemyShip("ship3");
+putEnemyShip("ship4");
+putEnemyShip("ship5");
